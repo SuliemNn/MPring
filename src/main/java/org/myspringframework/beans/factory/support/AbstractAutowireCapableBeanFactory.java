@@ -1,7 +1,11 @@
 package org.myspringframework.beans.factory.support;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.myspringframework.beans.BeansException;
+import org.myspringframework.beans.PropertyValue;
+import org.myspringframework.beans.PropertyValues;
 import org.myspringframework.beans.factory.config.BeanDefinition;
+import org.myspringframework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +18,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         //通过Jdk动态代理来进行实例化
         try {
             bean = createBeanInstance(beanName,beanDefinition,args);
+            // 给 Bean 填充属性
+            applyPropertyValues(beanName, bean, beanDefinition);
         }catch (InstantiationException | IllegalAccessException e){
             throw new BeansException("Instantiation of bean failed", e);
         } catch (InvocationTargetException e) {
@@ -65,4 +71,30 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         return instantiationStrategy.instantiate(beanDefinition,beanName,constructorToUse,args);
     }
+
+    /**
+     * Bean 属性填充
+     */
+    protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        try {
+            PropertyValues propertyValues = beanDefinition.getPropertyValues();
+            for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
+
+                String name = propertyValue.getName();
+                Object value = propertyValue.getValue();
+
+                if (value instanceof BeanReference) {
+                    // A 依赖 B，获取 B 的实例化
+                    BeanReference beanReference = (BeanReference) value;
+                    value = getBean(beanReference.getBeanName());
+                }
+                // 属性填充
+                BeanUtil.setFieldValue(bean, name, value);
+            }
+        } catch (Exception e) {
+            throw new BeansException("Error setting property values：" + beanName);
+        }
+    }
+
+
 }

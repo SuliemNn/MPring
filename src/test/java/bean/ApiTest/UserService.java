@@ -2,24 +2,23 @@ package bean.ApiTest;
 
 public class UserService {
 
-    private String name;
+    private String uId;
 
-    public UserService(String name) {
-        this.name = name;
+    private UserDao userDao;
+
+    public void queryUserInfo() {
+        System.out.println("查询用户信息：" + userDao.queryUserName(uId));
     }
 
     public UserService(){
-        this.name = "无参构造";
+        this.uId = "无参构造";
     }
 
-    public void queryUserInfo() {
-        System.out.println("查询用户信息：" + name);
-    }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("");
-        sb.append("").append(name);
+        sb.append("").append(uId);
         return sb.toString();
     }
 }
