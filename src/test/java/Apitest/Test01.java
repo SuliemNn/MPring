@@ -1,5 +1,7 @@
-package bean.ApiTest;
+package Apitest;
 
+import bean.UserDao;
+import bean.UserService;
 import org.junit.Test;
 import org.myspringframework.beans.PropertyValue;
 import org.myspringframework.beans.PropertyValues;
@@ -65,6 +67,8 @@ public class Test01 {
 
         // 5. UserService 获取bean
         UserService userService = (UserService) beanFactory.getBean("userService");
+        UserDao userDao = (UserDao) beanFactory.getBean("userDao");
         userService.queryUserInfo();
+        System.out.println(userService.queryUserInfo());
     }
 }
